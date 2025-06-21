@@ -1,4 +1,3 @@
-// RegisterRequest.java
 package com.dwestermann.erp.security.dto;
 
 import com.dwestermann.erp.security.entity.Role;

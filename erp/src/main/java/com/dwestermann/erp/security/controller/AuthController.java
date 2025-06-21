@@ -10,11 +10,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
-@CrossOrigin(origins = "*") // Für Development - später einschränken
+// @CrossOrigin entfernt - wird über WebConfig gehandelt
 public class AuthController {
 
     private final AuthService authService;
@@ -86,8 +88,9 @@ public class AuthController {
 
         TokenValidationResponse response = TokenValidationResponse.builder()
                 .valid(true)
-                .tenantId(tenantId)
+                .tenantId(tenantId) // Aus TenantContext, nicht hardcoded
                 .message("Token is valid")
+                .validatedAt(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);

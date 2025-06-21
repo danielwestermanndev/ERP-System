@@ -45,7 +45,7 @@ logging:
 
 # JWT Configuration (für alle Profile)
 jwt:
-  secret-key: "ErpSystem2025_SecureKey_d8f7e6c5b4a39281f0e9d8c7b6a5948372615048392817465029384756182930"
+  secret-key: "RXJwU3lzdGVtMjAyNVNlY3VyZUtleWQ4ZjdlNmM1YjRhMzkyODFmMGU5ZDhjN2I2YTU5NDgzNzI2MTUwNDgzOTI4MTc0NjUwMjkzODQ3NTYxODI5MzA="
   expiration: 86400000 # 24 hours
   refresh-expiration: 604800000 # 7 days
 

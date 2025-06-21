@@ -61,7 +61,7 @@ public class AuthService {
 
             // Update last login and reset failed attempts
             user.setLastLoginAt(LocalDateTime.now());
-            user.setFailedLoginAttempts(0);
+            user.resetFailedLoginAttempts(); // Use the method from User entity
             userRepository.save(user);
 
             // Generate tokens
@@ -115,18 +115,15 @@ public class AuthService {
 
         // Create new user
         User user = User.builder()
-                .id(UUID.randomUUID())
-                .tenantId(tenantId)
                 .email(request.getEmail())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(request.getRole() != null ? request.getRole() : Role.USER)
-                .isEmailVerified(false) // Require email verification
-                .isAccountLocked(false)
-                .isPasswordChangeRequired(false)
+                .emailVerified(true) // Für Development: Email automatisch als verifiziert setzen
+                .accountLocked(false)
+                .passwordChangeRequired(false)
                 .failedLoginAttempts(0)
-                .createdAt(LocalDateTime.now())
                 .build();
 
         user = userRepository.save(user);
@@ -292,15 +289,13 @@ public class AuthService {
     private void handleFailedLoginAttempt(String email, String tenantId) {
         userRepository.findByEmailAndTenantId(email, tenantId)
                 .ifPresent(user -> {
-                    int failedAttempts = user.getFailedLoginAttempts() + 1;
-                    user.setFailedLoginAttempts(failedAttempts);
+                    user.incrementFailedLoginAttempts();
 
                     // Lock account after 5 failed attempts
-                    if (failedAttempts >= 5) {
-                        user.setAccountLocked(true);
-                        user.setAccountLockedAt(LocalDateTime.now());
+                    if (user.getFailedLoginAttempts() >= 5) {
+                        user.lockAccount();
                         log.warn("Account locked for user {} in tenant {} due to {} failed login attempts",
-                                email, tenantId, failedAttempts);
+                                email, tenantId, user.getFailedLoginAttempts());
                     }
 
                     userRepository.save(user);

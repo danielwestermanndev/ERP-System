@@ -1,4 +1,3 @@
-// TokenValidationResponse.java
 package com.dwestermann.erp.security.dto;
 
 import lombok.Builder;

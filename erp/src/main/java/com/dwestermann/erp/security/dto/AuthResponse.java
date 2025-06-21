@@ -1,4 +1,3 @@
-// AuthResponse.java
 package com.dwestermann.erp.security.dto;
 
 import com.dwestermann.erp.security.entity.Role;
@@ -13,6 +12,7 @@ public class AuthResponse {
 
     private String accessToken;
     private String refreshToken;
+    @Builder.Default
     private String tokenType = "Bearer";
     private Long expiresIn; // seconds until expiration
 
@@ -21,7 +21,7 @@ public class AuthResponse {
     private String email;
     private String firstName;
     private String lastName;
-    private Role role;
+    private Role role; // Single Role, not Set
     private String tenantId;
 
     // Additional metadata

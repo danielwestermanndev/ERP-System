@@ -1,4 +1,3 @@
-// LogoutRequest.java
 package com.dwestermann.erp.security.dto;
 
 import jakarta.validation.constraints.NotBlank;
