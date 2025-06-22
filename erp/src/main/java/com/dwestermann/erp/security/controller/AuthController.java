@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Slf4j
-// @CrossOrigin entfernt - wird über WebConfig gehandelt
 public class AuthController {
 
     private final AuthService authService;
@@ -88,7 +87,7 @@ public class AuthController {
 
         TokenValidationResponse response = TokenValidationResponse.builder()
                 .valid(true)
-                .tenantId(tenantId) // Aus TenantContext, nicht hardcoded
+                .tenantId(tenantId)
                 .message("Token is valid")
                 .validatedAt(LocalDateTime.now())
                 .build();
@@ -117,10 +116,8 @@ public class AuthController {
 
         authService.changePassword(request);
 
-        MessageResponse response = MessageResponse.builder()
-                .message("Password changed successfully")
-                .success(true)
-                .build();
+        // ✅ Verwende static factory method statt Builder
+        MessageResponse response = MessageResponse.success("Password changed successfully");
 
         return ResponseEntity.ok(response);
     }
@@ -135,9 +132,34 @@ public class AuthController {
 
         authService.initiatePasswordReset(request.getEmail());
 
-        MessageResponse response = MessageResponse.builder()
-                .message("If the email exists, a password reset link has been sent")
-                .success(true)
+        // ✅ Verwende static factory method statt Builder
+        MessageResponse response = MessageResponse.info("If the email exists, a password reset link has been sent");
+
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Health check endpoint for authentication service
+     */
+    @GetMapping("/health")
+    public ResponseEntity<MessageResponse> healthCheck() {
+        MessageResponse response = MessageResponse.success("Authentication service is running");
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get tenant information
+     */
+    @GetMapping("/tenant-info")
+    public ResponseEntity<TenantInfoResponse> getTenantInfo() {
+        String tenantId = TenantContext.getTenantId();
+        log.debug("Get tenant info for tenant: {}", tenantId);
+
+        TenantInfoResponse response = TenantInfoResponse.builder()
+                .tenantId(tenantId)
+                .tenantName(tenantId) // Simplified - könnte aus DB kommen
+                .isActive(true)
+                .retrievedAt(LocalDateTime.now())
                 .build();
 
         return ResponseEntity.ok(response);

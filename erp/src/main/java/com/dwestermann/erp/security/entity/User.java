@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Entity
@@ -23,12 +24,12 @@ import java.util.stream.Collectors;
                 @Index(name = "idx_user_tenant", columnList = "tenant_id"),
                 @Index(name = "idx_user_role", columnList = "role")
         })
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-@EqualsAndHashCode(callSuper = true)
-@ToString(callSuper = true)
+@ToString(callSuper = true, exclude = {"password", "passwordResetToken", "emailVerificationToken"})
 public class User extends BaseEntity implements UserDetails {
 
     @Column(name = "email", nullable = false, length = 255)
@@ -299,22 +300,73 @@ public class User extends BaseEntity implements UserDetails {
     // JPA Lifecycle Callbacks
     // ========================================
 
+    /**
+     * Custom onCreate logic for User entity
+     * Ruft parent onCreate auf und fügt User-spezifische Logik hinzu
+     */
     @PrePersist
     @Override
     protected void onCreate() {
-        // Tenant-ID aus Context setzen
-        if (getTenantId() == null) {
-            setTenantId(TenantContext.getTenantId());
+        // WICHTIG: Parent-Methode zuerst aufrufen für Tenant-Context und Audit
+        super.onCreate();
+
+        // User-spezifische onCreate-Logik
+        if (this.passwordChangedAt == null) {
+            this.passwordChangedAt = LocalDateTime.now();
         }
 
-        // Parent onCreate aufrufen
-        super.onCreate();
+        // Email als lowercase für Konsistenz
+        if (this.email != null) {
+            this.email = this.email.toLowerCase().trim();
+        }
     }
 
+    /**
+     * Custom onUpdate logic for User entity
+     * Ruft parent onUpdate auf und fügt User-spezifische Logik hinzu
+     */
     @PreUpdate
     @Override
     protected void onUpdate() {
-        // Parent onUpdate aufrufen
+        // WICHTIG: Parent-Methode zuerst aufrufen für Audit-Updates
         super.onUpdate();
+
+        // User-spezifische onUpdate-Logik
+        // Email als lowercase für Konsistenz
+        if (this.email != null) {
+            this.email = this.email.toLowerCase().trim();
+        }
+    }
+
+    // ========================================
+    // EQUALS & HASHCODE - Manual Implementation
+    // ========================================
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+
+        User user = (User) o;
+
+        // Primary: Compare by ID if both exist
+        if (this.getId() != null && user.getId() != null) {
+            return this.getId().equals(user.getId());
+        }
+
+        // Secondary: Compare by email + tenantId for business equality
+        return Objects.equals(email, user.email) &&
+                Objects.equals(getTenantId(), user.getTenantId());
+    }
+
+    @Override
+    public int hashCode() {
+        // If ID exists, use it
+        if (getId() != null) {
+            return getId().hashCode();
+        }
+
+        // If no ID, use email + tenantId
+        return Objects.hash(email, getTenantId());
     }
 }

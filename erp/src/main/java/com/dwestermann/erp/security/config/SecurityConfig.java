@@ -3,8 +3,10 @@ package com.dwestermann.erp.security.config;
 import com.dwestermann.erp.security.jwt.JwtAuthenticationFilter;
 import com.dwestermann.erp.security.service.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,8 +33,9 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
     private final CorsConfigurationSource corsConfigurationSource;
-    private final CustomPermissionEvaluator permissionEvaluator;
-    private final DevPermissionEvaluator devPermissionEvaluator;
+
+    // ✅ Spring wählt automatisch den richtigen PermissionEvaluator basierend auf dem aktiven Profil
+    private final PermissionEvaluator permissionEvaluator;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -83,7 +86,8 @@ public class SecurityConfig {
     @Bean
     public MethodSecurityExpressionHandler methodSecurityExpressionHandler() {
         DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
-        handler.setPermissionEvaluator(devPermissionEvaluator); // ÄNDERUNG: DevPermissionEvaluator verwenden
+        // ✅ Spring injiziert automatisch den richtigen PermissionEvaluator
+        handler.setPermissionEvaluator(permissionEvaluator);
         return handler;
     }
 

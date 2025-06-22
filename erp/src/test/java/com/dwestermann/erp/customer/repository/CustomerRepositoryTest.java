@@ -1,3 +1,4 @@
+// src/test/java/com/dwestermann/erp/customer/repository/CustomerRepositoryTest.java
 package com.dwestermann.erp.customer.repository;
 
 import com.dwestermann.erp.customer.domain.Customer;
@@ -13,13 +14,19 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@ActiveProfiles("test")
+@ActiveProfiles("dev")
+@TestPropertySource(properties = {
+        "spring.jpa.hibernate.ddl-auto=create-drop",
+        "spring.datasource.url=jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1",
+        "jwt.secret-key=test-secret-key-minimum-256-bits-for-testing"
+})
 class CustomerRepositoryTest {
 
     @Autowired

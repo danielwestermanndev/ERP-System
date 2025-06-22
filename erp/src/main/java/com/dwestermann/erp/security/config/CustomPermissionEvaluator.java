@@ -3,6 +3,7 @@ package com.dwestermann.erp.security.config;
 import com.dwestermann.erp.security.entity.Permission;
 import com.dwestermann.erp.security.entity.Role;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.PermissionEvaluator;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import java.io.Serializable;
 import java.util.Set;
 
 @Component
+@Profile("!test")
 @Slf4j
 public class CustomPermissionEvaluator implements PermissionEvaluator {
 

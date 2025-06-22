@@ -58,17 +58,17 @@ spring:
     activate:
       on-profile: dev
 
-  # H2 Database für schnelle Entwicklung
+  # H2 Database für schnelle Entwicklung - GEÄNDERT
   datasource:
-    url: jdbc:h2:mem:erp_dev;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    url: jdbc:h2:file:./data/erpdb;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password: ""
 
-  # JPA/Hibernate
+  # JPA/Hibernate - GEÄNDERT
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update  # Geändert von create-drop zu update
     show-sql: true
     properties:
       hibernate:
@@ -76,7 +76,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
         default_schema: public
 
-  # H2 Console
+  # H2 Console - UNVERÄNDERT
   h2:
     console:
       enabled: true
@@ -84,7 +84,7 @@ spring:
       settings:
         web-allow-others: true
 
-  # Devtools
+  # Devtools - UNVERÄNDERT
   devtools:
     restart:
       enabled: true

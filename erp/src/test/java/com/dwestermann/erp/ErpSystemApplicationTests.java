@@ -1,11 +1,16 @@
+// src/test/java/com/dwestermann/erp/ErpSystemApplicationTests.java
 package com.dwestermann.erp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-@ActiveProfiles("test") // Wichtig: Test-Profil verwenden
+@ActiveProfiles("dev")
+@TestPropertySource(properties = {
+		"jwt.secret-key=test-secret-key-minimum-256-bits-for-HS256-algorithm-testing-purposes-only"
+})
 class ErpSystemApplicationTests {
 
 	@Test

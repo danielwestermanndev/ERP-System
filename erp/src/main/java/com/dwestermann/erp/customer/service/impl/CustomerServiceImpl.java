@@ -115,10 +115,20 @@ public class CustomerServiceImpl implements CustomerService {
             }
         }
 
-        // Ensure tenant ID is not changed
-        customer.setTenantId(tenantId);
+        // Update fields on existing customer (preserves JPA version and audit fields)
+        existingCustomer.setName(customer.getName());
+        existingCustomer.setEmail(customer.getEmail());
+        existingCustomer.setPhone(customer.getPhone());
+        existingCustomer.setCustomerNumber(customer.getCustomerNumber());
+        existingCustomer.setStatus(customer.getStatus());
+        existingCustomer.setType(customer.getType());
+        existingCustomer.setPrimaryAddress(customer.getPrimaryAddress());
+        existingCustomer.setNotes(customer.getNotes());
 
-        Customer updatedCustomer = customerRepository.save(customer);
+        // Tenant ID stays the same from existing customer
+        // Version will be automatically incremented by JPA
+
+        Customer updatedCustomer = customerRepository.save(existingCustomer);
         log.info("Updated customer with ID: {} for tenant: {}", updatedCustomer.getId(), tenantId);
 
         return updatedCustomer;
